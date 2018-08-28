@@ -1,0 +1,124 @@
+php design mode -- Prototype
+1、模式定义
+通过创建原型使用克隆方法实现对象创建而不是使用标准的 new 方式。
+
+BookPrototype.php
+<?php
+
+namespace DesignPatterns\Creational\Prototype;
+
+/**
+ * BookPrototype类
+ */
+abstract class BookPrototype
+{
+    /**
+     * @var string
+     */
+    protected $title;
+
+    /**
+     * @var string
+     */
+    protected $category;
+
+    /**
+     * @abstract
+     * @return void
+     */
+    abstract public function __clone();
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+}
+
+
+BarBookPrototype.php
+<?php
+
+namespace DesignPatterns\Creational\Prototype;
+
+/**
+ * BarBookPrototype类
+ */
+class BarBookPrototype extends BookPrototype
+{
+    /**
+     * @var string
+     */
+    protected $category = 'Bar';
+
+    /**
+     * empty clone
+     */
+    public function __clone()
+    {
+    }
+}
+
+FooBookPrototype.php
+<?php
+
+namespace DesignPatterns\Creational\Prototype;
+
+/**
+ * FooBookPrototype类
+ */
+class FooBookPrototype extends BookPrototype
+{
+    protected $category = 'Foo';
+
+    /**
+     * empty clone
+     */
+    public function __clone()
+    {
+    }
+}
+
+
+Tests/PrototypeTest.php
+<?php
+
+namespace DesignPatterns\Creational\Prototype\Tests;
+
+use DesignPatterns\Creational\Prototype\BookPrototype;
+use DesignPatterns\Creational\Prototype\FooBookPrototype;
+use DesignPatterns\Creational\Prototype\BarBookPrototype;
+
+/**
+ * PrototypeTest tests the prototype pattern
+ */
+class PrototypeTest extends \PHPUnit_Framework_TestCase
+{
+
+     public function getPrototype(){
+         return array(
+             array(new FooBookPrototype()),
+             array(new BarBookPrototype())
+         );
+     }
+
+     /**
+      * @dataProvider getPrototype
+      */
+     public function testCreation(BookPrototype $prototype)
+     {
+         $book = clone $prototype;
+         $book->setTitle($book->getCategory().' Book');
+         $this->assertInstanceOf('DesignPatterns\Creational\Prototype\BookPrototype', $book);
+     }
+}
