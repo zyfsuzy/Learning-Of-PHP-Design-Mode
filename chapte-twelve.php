@@ -6,7 +6,7 @@
 
 Laravel 中流接口模式有着广泛使用，比如查询构建器，邮件等等。
 */
-<?php
+
 
 namespace DesignPatterns\Structural\FluentInterface;
 
