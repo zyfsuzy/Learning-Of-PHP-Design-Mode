@@ -16,7 +16,7 @@ abstract class Registry
      * @var array
      */
     protected static $storedValues = array();
-
+    private   static $allowedKeys = ['logger'];
     /**
      * sets a value
      *
@@ -28,7 +28,11 @@ abstract class Registry
      */
     public static function set($key, $value)
     {
+        if (!in_array($key, self::$allowedKeys)) {
+            throw new \InvalidArgumentException('Invalid key given');
+        }
         self::$storedValues[$key] = $value;
+        
     }
 
     /**
