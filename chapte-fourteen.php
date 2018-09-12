@@ -62,3 +62,5 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('StdClass', $logger);
     }
 }
+
+//总结：目标是将经常使用的类的对象存放。
