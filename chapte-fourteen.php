@@ -15,8 +15,8 @@ abstract class Registry
     /**
      * @var array
      */
-    protected static $storedValues = array();
-    private   static $allowedKeys = ['logger'];
+    protected static $storedValues = array();    // store center
+    private   static $allowedKeys = ['logger'];  //purpose of this array is set a conventions of objects
     /**
      * sets a value
      *
