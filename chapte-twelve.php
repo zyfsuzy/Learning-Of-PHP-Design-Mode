@@ -86,7 +86,7 @@ class Sql
     }
 }
 
-<?php
+
 
 namespace DesignPatterns\Structural\FluentInterface\Tests;
 
@@ -111,4 +111,4 @@ class FluentInterfaceTest extends \PHPUnit_Framework_TestCase
 }
 
 /*
-流接口模式如同工厂作业一样，对产品各个部件进行组装，最后生成完整的产品。
+流接口模式如同工厂作业一样，对产品各个部件进行组装，最后生成完整的产品,调用类的各个接口，每一个接口负责语句的一部分，最后得到完整的语句结构，提供方便的表达式生成类。
