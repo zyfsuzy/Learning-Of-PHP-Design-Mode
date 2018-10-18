@@ -12,7 +12,7 @@ class OrderContext
     public static function create(): OrderContext
     {
         $order = new self();
-        $order->state = new StateCreated();
+        $order->state = new StateCreated();   /*创建该类时初始化一个状态类 */
         return $order;
     }
     public function setState(State $state)
@@ -30,11 +30,11 @@ class OrderContext
 }
 
 
-
+/* 抽象每一个类对应的共同点*/ 
 namespace DesignPatterns\Behavioral\State;
 interface State
 {
-    public function proceedToNext(OrderContext $context);
+    public function proceedToNext(OrderContext $context); //转为下一个状态
     public function toString(): string;
 }
 
@@ -114,4 +114,4 @@ class StateTest extends TestCase
         $this->assertSame('done', $contextOrder->toString());
     }
 }
-//状态模式，模式流程为对象初始化一个状态类，不同状态类都继承约束的接口，每一个状态类又可以对象状态置为下一个状态。
+//状态模式，模式流程为对象初始化一个状态类，不同状态类都继承约束的接口，将对象的状态的转换封装在对象内部，每一个状态类又可以对象状态置为下一个状态。
