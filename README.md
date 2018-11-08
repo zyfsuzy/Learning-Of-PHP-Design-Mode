@@ -1,4 +1,4 @@
-# Learning-Of-PHP-Design-Mode
+# PHP-Design-Mode
 
 Abstract Factory
 ====
