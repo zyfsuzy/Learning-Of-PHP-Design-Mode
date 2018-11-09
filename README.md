@@ -239,3 +239,94 @@ class StdoutLoggerFactory implements LoggerFactory
 定义另一种工厂类，该工厂与上一个工厂的区别在于用于创建的对象类型的类型不同。既然都是工厂那都必须继承```LoggerFactory```接口。
 
 工厂方法之所以都实现依赖注入面向对象原则，因为几乎有每一个实体类都依赖的抽象而不是具体的实体类。真正实现```SOLID```原则种的D。
+
+
+Strategy
+===
+Purpose
+---
+区分不同策略，并能快速选择一种策略模式。</br>
+
+Code
+---
+
+```ComparatorInterface.php```
+
+```php
+<?php
+namespace DesignPatterns\Behavioral\Strategy;
+interface ComparatorInterface
+{
+    /**
+     * @param mixed $a
+     * @param mixed $b
+     *
+     * @return int
+     */
+    public function compare($a, $b): int;
+}
+```
+约定策略的接口
+
+```IdComparator.php```
+```php
+<?php
+namespace DesignPatterns\Behavioral\Strategy;
+class IdComparator implements ComparatorInterface
+{
+    /**
+     * @param mixed $a
+     * @param mixed $b
+     *
+     * @return int
+     */
+    public function compare($a, $b): int
+    {
+        return $a['id'] <=> $b['id'];
+    }
+}
+```
+```DateComparator.php```
+```
+<?php
+namespace DesignPatterns\Behavioral\Strategy;
+class DateComparator implements ComparatorInterface
+{
+    /**
+     * @param mixed $a
+     * @param mixed $b
+     *
+     * @return int
+     */
+    public function compare($a, $b): int
+    {
+        $aDate = new \DateTime($a['date']);
+        $bDate = new \DateTime($b['date']);
+        return $aDate <=> $bDate;
+    }
+}
+```
+
+```context.php```
+```php
+<?php
+namespace DesignPatterns\Behavioral\Strategy;
+class Context
+{
+    /**
+     * @var ComparatorInterface
+     */
+    private $comparator;
+    public function __construct(ComparatorInterface $comparator)
+    {
+        $this->comparator = $comparator;
+    }
+    public function executeStrategy(array $elements) : array
+    {
+        uasort($elements, [$this->comparator, 'compare']);
+        return $elements;
+    }
+}
+```
+
+创建一个类对象时指定一种策略类对象，每一种策略对应处理方法内部逻辑调用者并不需要关注。
