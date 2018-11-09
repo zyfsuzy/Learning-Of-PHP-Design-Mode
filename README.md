@@ -330,3 +330,112 @@ class Context
 ```
 
 创建一个类对象时指定一种策略类对象，每一种策略对应处理方法内部逻辑调用者并不需要关注。
+
+
+
+
+State
+===
+Purpose
+---
+很明确的指出了对象状态改变的情况。
+
+```state.php```
+```php
+<?php
+namespace DesignPatterns\Behavioral\State;
+interface State
+{
+    public function proceedToNext(OrderContext $context);
+    public function toString(): string;
+}
+```
+指明了各个状态需要需要的接口。
+
+
+```createstate.php```
+```php
+<?php
+namespace DesignPatterns\Behavioral\State;
+class StateCreated implements State
+{
+    public function proceedToNext(OrderContext $context)
+    {
+        $context->setState(new StateShipped());
+    }
+    public function toString(): string
+    {
+        return 'created';
+    }
+}
+```
+初始化状态类，并为对象指定一个状态。
+
+```ship.php```
+```php
+<?php
+namespace DesignPatterns\Behavioral\State;
+class StateShipped implements State
+{
+    public function proceedToNext(OrderContext $context)
+    {
+        $context->setState(new StateDone());
+    }
+    public function toString(): string
+    {
+        return 'shipped';
+    }
+}
+```
+中间状态
+
+```done.php```
+```php
+<?php
+namespace DesignPatterns\Behavioral\State;
+class StateDone implements State
+{
+    public function proceedToNext(OrderContext $context)
+    {
+        // there is nothing more to do
+    }
+    public function toString(): string
+    {
+        return 'done';
+    }
+}
+```
+
+
+```context.php```
+```php
+<?php
+namespace DesignPatterns\Behavioral\State;
+class OrderContext
+{
+    /**
+     * @var State
+     */
+    private $state;
+    public static function create(): OrderContext
+    {
+        $order = new self();
+        $order->state = new StateCreated();
+        return $order;
+    }
+    public function setState(State $state)
+    {
+        $this->state = $state;
+    }
+    public function proceedToNext()
+    {
+        $this->state->proceedToNext($this);
+    }
+    public function toString()
+    {
+        return $this->state->toString();
+    }
+}
+```
+
+创建类的初始化一个状态类，类的对象可以向下一个状态进行。
