@@ -439,3 +439,185 @@ class OrderContext
 ```
 
 创建类的初始化一个状态类，类的对象可以向下一个状态进行。
+
+
+
+
+
+Adapter
+==
+Purpose
+---
+将一个接口转换为兼容接口
+
+Coding 
+---
+```BookInterface.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Adapter;
+interface BookInterface
+{
+    public function turnPage();
+    public function open();
+    public function getPage(): int;
+}
+```
+
+```book.php```
+```
+<?php
+namespace DesignPatterns\Structural\Adapter;
+class Book implements BookInterface
+{
+    /**
+     * @var int
+     */
+    private $page;
+    public function open()
+    {
+        $this->page = 1;
+    }
+    public function turnPage()
+    {
+        $this->page++;
+    }
+    public function getPage(): int
+    {
+        return $this->page;
+    }
+}
+```
+book类继承了interface接口，让类依赖抽象，不依赖具体的实体类。
+
+```EBookAdapter.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Adapter;
+/**
+ * This is the adapter here. Notice it implements BookInterface,
+ * therefore you don't have to change the code of the client which is using a Book
+ */
+class EBookAdapter implements BookInterface
+{
+    /**
+     * @var EBookInterface
+     */
+    protected $eBook;
+    /**
+     * @param EBookInterface $eBook
+     */
+    public function __construct(EBookInterface $eBook)
+    {
+        $this->eBook = $eBook;
+    }
+    /**
+     * This class makes the proper translation from one interface to another.
+     */
+    public function open()
+    {
+        $this->eBook->unlock();
+    }
+    public function turnPage()
+    {
+        $this->eBook->pressNext();
+    }
+    /**
+     * notice the adapted behavior here: EBookInterface::getPage() will return two integers, but BookInterface
+     * supports only a current page getter, so we adapt the behavior here
+     *
+     * @return int
+     */
+    public function getPage(): int
+    {
+        return $this->eBook->getPage()[0];
+    }
+}
+```
+该类继承的是bookinterface，但属性eBook确实一个继承eBookInterface类的对象。
+但有一个特点，就是该类所有的实现方法，都是bookInterface接口方法，但是方法内部又调用eBookInterface接口的方法，这么做的给外观类感觉他们继承的是同一个接口。因此，称为适配器。
+
+```
+EBookInterface.php
+```
+```
+<?php
+namespace DesignPatterns\Structural\Adapter;
+interface EBookInterface
+{
+    public function unlock();
+    public function pressNext();
+    /**
+     * returns current page and total number of pages, like [10, 100] is page 10 of 100
+     *
+     * @return int[]
+     */
+    public function getPage(): array;
+}
+```
+
+
+```kindle.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Adapter;
+/**
+ * this is the adapted class. In production code, this could be a class from another package, some vendor code.
+ * Notice that it uses another naming scheme and the implementation does something similar but in another way
+ */
+class Kindle implements EBookInterface
+{
+    /**
+     * @var int
+     */
+    private $page = 1;
+    /**
+     * @var int
+     */
+    private $totalPages = 100;
+    public function pressNext()
+    {
+        $this->page++;
+    }
+    public function unlock()
+    {
+    }
+    /**
+     * returns current page and total number of pages, like [10, 100] is page 10 of 100
+     *
+     * @return int[]
+     */
+    public function getPage(): array
+    {
+        return [$this->page, $this->totalPages];
+    }
+}
+```
+```test.php```
+```
+<?php
+namespace DesignPatterns\Structural\Adapter\Tests;
+use DesignPatterns\Structural\Adapter\Book;
+use DesignPatterns\Structural\Adapter\EBookAdapter;
+use DesignPatterns\Structural\Adapter\Kindle;
+use PHPUnit\Framework\TestCase;
+class AdapterTest extends TestCase
+{
+    public function testCanTurnPageOnBook()
+    {
+        $book = new Book();
+        $book->open();
+        $book->turnPage();
+        $this->assertSame(2, $book->getPage());
+    }
+    public function testCanTurnPageOnKindleLikeInANormalBook()
+    {
+        $kindle = new Kindle();
+        $book = new EBookAdapter($kindle);
+        $book->open();
+        $book->turnPage();
+        $this->assertSame(2, $book->getPage());
+    }
+}
+```
+
