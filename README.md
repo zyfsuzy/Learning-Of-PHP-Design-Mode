@@ -621,3 +621,126 @@ class AdapterTest extends TestCase
 }
 ```
 
+
+
+
+Decerator
+===
+Purpose
+---
+动态地为一个类添加新的功能</br>
+```booking.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Decorator;
+interface Booking
+{
+    public function calculatePrice(): int;
+    public function getDescription(): string;
+}
+```
+```bookingDecorator.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Decorator;
+abstract class BookingDecorator implements Booking
+{
+    /**
+     * @var Booking
+     */
+    protected $booking;
+    public function __construct(Booking $booking)
+    {
+        $this->booking = $booking;
+    }
+}
+```
+```DoubleRoomBooking.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Decorator;
+class DoubleRoomBooking implements Booking
+{
+    public function calculatePrice(): int
+    {
+        return 40;
+    }
+    public function getDescription(): string
+    {
+        return 'double room';
+    }
+}
+```
+
+```ExtraBed.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Decorator;
+class ExtraBed extends BookingDecorator
+{
+    private const PRICE = 30;
+    public function calculatePrice(): int
+    {
+        return $this->booking->calculatePrice() + self::PRICE;
+    }
+    public function getDescription(): string
+    {
+        return $this->booking->getDescription() . ' with extra bed';
+    }
+}
+```
+
+```wifi.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Decorator;
+class WiFi extends BookingDecorator
+{
+    private const PRICE = 2;
+    public function calculatePrice(): int
+    {
+        return $this->booking->calculatePrice() + self::PRICE;
+    }
+    public function getDescription(): string
+    {
+        return $this->booking->getDescription() . ' with wifi';
+    }
+}
+```
+
+```test.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Decorator\Tests;
+use DesignPatterns\Structural\Decorator\DoubleRoomBooking;
+use DesignPatterns\Structural\Decorator\ExtraBed;
+use DesignPatterns\Structural\Decorator\WiFi;
+use PHPUnit\Framework\TestCase;
+class DecoratorTest extends TestCase
+{
+    public function testCanCalculatePriceForBasicDoubleRoomBooking()
+    {
+        $booking = new DoubleRoomBooking();
+        $this->assertSame(40, $booking->calculatePrice());
+        $this->assertSame('double room', $booking->getDescription());
+    }
+    public function testCanCalculatePriceForDoubleRoomBookingWithWiFi()
+    {
+        $booking = new DoubleRoomBooking();
+        $booking = new WiFi($booking);
+        $this->assertSame(42, $booking->calculatePrice());
+        $this->assertSame('double room with wifi', $booking->getDescription());
+    }
+    public function testCanCalculatePriceForDoubleRoomBookingWithWiFiAndExtraBed()
+    {
+        $booking = new DoubleRoomBooking();
+        $booking = new WiFi($booking);
+        $booking = new ExtraBed($booking);
+        $this->assertSame(72, $booking->calculatePrice());
+        $this->assertSame('double room with wifi with extra bed', $booking->getDescription());
+    }
+}
+```
+
+如何体现动态添加额外的功能，通过在抽象类种传入一个对象，通过为继承该抽象类的类添加额外的功能。
+
