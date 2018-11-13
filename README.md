@@ -744,3 +744,100 @@ class DecoratorTest extends TestCase
 
 如何体现动态添加额外的功能，通过在抽象类种传入一个对象，通过为继承该抽象类的类添加额外的功能。
 
+
+Facade
+===
+Purpose
+---
+
+```BiosInterFace.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Facade;
+interface BiosInterface
+{
+    public function execute();
+    public function waitForKeyPress();
+    public function launch(OsInterface $os);
+    public function powerDown();
+}
+```
+
+```osinterface.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Facade;
+interface OsInterface
+{
+    public function halt();
+    public function getName(): string;
+}
+```
+```Facade.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Facade;
+class Facade
+{
+    /**
+     * @var OsInterface
+     */
+    private $os;
+    /**
+     * @var BiosInterface
+     */
+    private $bios;
+    /**
+     * @param BiosInterface $bios
+     * @param OsInterface   $os
+     */
+    public function __construct(BiosInterface $bios, OsInterface $os)
+    {
+        $this->bios = $bios;
+        $this->os = $os;
+    }
+    public function turnOn()
+    {
+        $this->bios->execute();
+        $this->bios->waitForKeyPress();
+        $this->bios->launch($this->os);
+    }
+    public function turnOff()
+    {
+        $this->os->halt();
+        $this->bios->powerDown();
+    }
+}
+
+```
+```test.php```
+```php
+<?php
+namespace DesignPatterns\Structural\Facade\Tests;
+use DesignPatterns\Structural\Facade\Facade;
+use DesignPatterns\Structural\Facade\OsInterface;
+use PHPUnit\Framework\TestCase;
+class FacadeTest extends TestCase
+{
+    public function testComputerOn()
+    {
+        /** @var OsInterface|\PHPUnit_Framework_MockObject_MockObject $os */
+        $os = $this->createMock('DesignPatterns\Structural\Facade\OsInterface');
+        $os->method('getName')
+            ->will($this->returnValue('Linux'));
+        $bios = $this->getMockBuilder('DesignPatterns\Structural\Facade\BiosInterface')
+            ->setMethods(['launch', 'execute', 'waitForKeyPress'])
+            ->disableAutoload()
+            ->getMock();
+        $bios->expects($this->once())
+            ->method('launch')
+            ->with($os);
+        $facade = new Facade($bios, $os);
+        // the facade interface is simple
+        $facade->turnOn();
+        // but you can also access the underlying components
+        $this->assertSame('Linux', $os->getName());
+    }
+}
+```
+
