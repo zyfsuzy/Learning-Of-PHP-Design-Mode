@@ -925,5 +925,3 @@ class ProxyTest extends TestCase
     }
 }
 ```
-
-
